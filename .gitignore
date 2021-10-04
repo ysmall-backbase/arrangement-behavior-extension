@@ -1,0 +1,13 @@
+.*
+!.git?*
+!.mvn/
+target/
+build/
+bin/
+*.iml
+*.tmp
+*.log
+*.jdbc
+*.launch
+/repository
+/settings.xml

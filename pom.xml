@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.backbase.buildingblocks</groupId>
+        <artifactId>backbase-service-extension-starter-parent</artifactId>
+        <version>12.3.0</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.backbase.cnb</groupId>
+    <artifactId>arrangement-behavior-extension</artifactId>
+    <version>1.0.33-SNAPSHOT</version>
+
+    <properties>
+        <dbs.version>2.21.1</dbs.version>
+        <ssdk.version>12.0.0</ssdk.version>
+
+        <!-- TODO downgrade jib plugin version to be remove with SSDK fix this issue-->
+        <jib-maven-plugin.version>2.5.2</jib-maven-plugin.version>
+
+        <!-- docker configuration -->
+        <!--suppress UnresolvedMavenProperty -->
+        <docker.repo.url>${DEVOPS_CICD_ECR_BASE_URL}</docker.repo.url>
+        <!--suppress UnresolvedMavenProperty --> 
+        <!-- we might want to change this to point to repo.backbase.com -->
+        <base.image.docker.repo.url>${DEVOPS_CICD_SHARED_ECR_BASE_URL}</base.image.docker.repo.url> 
+
+        <docker.image.name>${docker.repo.url}/${project.artifactId}</docker.image.name>
+        <docker.image.tag>${project.version}</docker.image.tag>
+
+        <!-- base image -->
+        <docker.base.name>${base.image.docker.repo.url}/arrangement-manager</docker.base.name>
+        <docker.base.tag>DBS-${dbs.version}</docker.base.tag>
+
+        <docker.image.name>${docker.repo.url}/${project.artifactId}</docker.image.name>
+        <docker.distroless.jar.latest.skip>true</docker.distroless.jar.latest.skip>
+
+        <lombok.version>1.18.0</lombok.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.backbase.dbs</groupId>
+                <artifactId>banking-services-bom</artifactId>
+                <version>${dbs.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- DBS integration -->
+        <dependency>
+            <groupId>com.backbase.dbs.arrangement</groupId>
+            <artifactId>arrangement-manager</artifactId>
+            <classifier>classes</classifier>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- code utils -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>com.backbase.buildingblocks</groupId>
+            <artifactId>service-sdk-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>local-client</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <docker.repo.url>repo.backbase.com/backbase-docker-releases</docker.repo.url>
+                <base.image.docker.repo.url>repo.backbase.com/backbase-docker-releases</base.image.docker.repo.url>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>no-scs</id>
+            <properties>
+                <docker.scs.rabbit>provided</docker.scs.rabbit>
+                <docker.scs.kafka>provided</docker.scs.kafka>
+            </properties>
+        </profile>
+    </profiles>
+
+</project>
